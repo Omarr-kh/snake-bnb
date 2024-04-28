@@ -79,21 +79,48 @@ def log_into_account():
 def register_cage():
     print(' ****************** REGISTER CAGE **************** ')
 
-    # TODO: Require an account
-    # TODO: Get info about cage
-    # TODO: Save cage to DB.
+    if not state.active_account:
+        error_msg('You must login first to register a cage.')
+        return
 
-    print(" -------- NOT IMPLEMENTED -------- ")
+    meters = input('How many square meters is the cage? ')
+    if not meters:
+        error_msg('Cancelled')
+        return
+
+    meters = float(meters)
+    carpeted = input('Is it Carpeted [y, n]? ').lower().startswith('y')
+    has_toys = input('Have snake toys [y, n]? ').lower().startswith('y')
+    allow_dangerous = input('Can you host venomous snakes [y, n]? ').lower().startswith('y')
+    name = input('Name your cage: ')
+    price = float(input('How much are you charging? '))
+
+    cage = svc.register_cage(
+        state.active_account,
+        name,
+        allow_dangerous,
+        has_toys,
+        carpeted,
+        meters,
+        price
+    )
+
+    state.reload_account()
+    success_msg(f'Registered new cage with id {cage.id}.')
 
 
-def list_cages(supress_header=False):
-    if not supress_header:
+def list_cages(suppress_header=False):
+    if not suppress_header:
         print(' ******************     Your cages     **************** ')
 
-    # TODO: Require an account
-    # TODO: Get cages, list details
+    if not state.active_account:
+        error_msg('You must login first to register a cage.')
+        return
 
-    print(" -------- NOT IMPLEMENTED -------- ")
+    cages = svc.find_cages_for_user(state.active_account)
+    print(f'You have {len(cages)} cages.')
+    for cage in cages:
+        print(f'* {cage.name} is {cage.square_meters} meters.')
 
 
 def update_availability():
